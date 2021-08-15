@@ -4,24 +4,28 @@ var tasksToDoElement = document.querySelector("#tasks-to-do");
 var createTaskHandler = function (event) {
    event.preventDefault();
 
+   var taskNameInput = document.querySelector("input[name='task-name']").value;
+   var taskTypeInput = document.querySelector("select[name='task-type']").value;
+
+   // Create list item
    var listItemElement = document.createElement("li");
+   // Give it a class name
    listItemElement.className = "task-item";
-   listItemElement.textContent = "This is a new task.";
+
+   // Create div item to hold task info and add to list item
+   var taskInfoElement = document.createElement("div");
+   // Give it a class name
+   taskInfoElement.className = "task-info";
+
+   // Add HTML content to div item
+   taskInfoElement.innerHTML =
+      "<h3 class='task-name'>" + taskNameInput + "</h3><span class='task-type'>" + taskTypeInput + "</span>";
+
+   listItemElement.appendChild(taskInfoElement);
+
+   // Add entire list item to list
    tasksToDoElement.appendChild(listItemElement);
+   console.dir(listItemElement);
 };
 
 formElement.addEventListener("submit", createTaskHandler);
-
-// Add a task form to HTML. We'll add an HTML form that will allow the user to enter the task name and type.
-
-// Handle form submission. We'll use JavaScript to add a task to the list when the "Add Task" button is clicked.
-
-// Capture form field values. We'll use JavaScript to capture the unique information the user enters (the task name and type).
-
-// Organize functionality. We'll refactor the code to make it more maintainable.
-
-// Address usability concerns. We'll improve the user experience by validating form input and resetting the form after the user clicks the "Add Task" button.
-
-// Save our progress with Git. We'll commit and push our changes up to GitHub
-
-// var buttonElement = document.querySelector("#save-task");
