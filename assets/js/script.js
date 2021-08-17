@@ -6,6 +6,28 @@ var tasksCompletedElement = document.querySelector("#tasks-completed");
 var pageContentElement = document.querySelector("#page-content");
 var tasks = [];
 
+var loadTasks = function () {
+   // Gets task items from localStorage.
+   var savedTasks = localStorage.getItem("tasks");
+
+   if (savedTasks === null) {
+      return false;
+   }
+
+   // Converts tasks from the string format back into an array of objects.
+   savedTasks = JSON.parse(savedTasks);
+
+   // Loop through savedTasks array
+   for (var i = 0; i < savedTasks.length; i++) {
+      // Pass each task object into the 'createTaskElement()' function
+      createTaskElement(savedTasks[i]);
+   }
+};
+
+var saveTasks = function () {
+   localStorage.setItem("tasks", JSON.stringify(tasks));
+};
+
 var taskStatusChangeHandler = function (event) {
    // console.log(event.target);
    // Get the task item's id
@@ -138,7 +160,7 @@ var createTaskActions = function (taskId) {
 
    actionContainerElement.appendChild(statusSelectElement);
 
-   var statusChoices = ["To Do", "In Progress", "Completed"];
+   var statusChoices = ["", "To Do", "In Progress", "Completed"];
 
    for (var i = 0; i < statusChoices.length; i++) {
       // Create option element
@@ -146,10 +168,56 @@ var createTaskActions = function (taskId) {
       statusOptionElement.setAttribute("value", statusChoices[i]);
       statusOptionElement.textContent = statusChoices[i];
 
+      // Set up condition to display "Pick a Column" w/ DISABLED SELECTED properties
+      if (i === 0) {
+         statusOptionElement.textContent = "Pick a Column";
+         statusOptionElement.setAttribute("disabled", "true");
+         statusOptionElement.setAttribute("selected", "true");
+      } else {
+         // Display selected option in dropdown menu.
+         statusOptionElement.textContent = statusChoices[i];
+      }
+
       // Append to select
       statusSelectElement.appendChild(statusOptionElement);
    }
    return actionContainerElement;
+};
+
+var createTaskElement = function (taskDataObj) {
+   // Create list item
+   var listItemElement = document.createElement("li");
+   // Give it a class name
+   listItemElement.className = "task-item";
+
+   // Add task ID as a custom attribute
+   listItemElement.setAttribute("data-task-id", taskIdCounter);
+
+   // Create div item to hold task info and add to list item
+   var taskInfoElement = document.createElement("div");
+   // Give it a class name
+   taskInfoElement.className = "task-info";
+   // Add HTML content to div item
+   taskInfoElement.innerHTML =
+      "<h3 class='task-name'>" + taskDataObj.name + "</h3><span class='task-type'>" + taskDataObj.type + "</span>";
+   listItemElement.appendChild(taskInfoElement);
+
+   var taskActionsElement = createTaskActions(taskIdCounter);
+   listItemElement.appendChild(taskActionsElement);
+
+   if (taskDataObj.status === "to do") {
+      tasksToDoElement.appendChild(listItemElement);
+   } else if (taskDataObj.status === "in progress") {
+      tasksInProgressElement.appendChild(listItemElement);
+   } else if (taskDataObj.status === "completed") {
+      tasksCompletedElement.appendChild(listItemElement);
+   }
+
+   taskDataObj.id = taskIdCounter;
+   tasks.push(taskDataObj);
+   saveTasks();
+   // Increase task counter for next unique id
+   taskIdCounter++;
 };
 
 var taskFormHandler = function (event) {
@@ -183,60 +251,6 @@ var taskFormHandler = function (event) {
       // Send it as an argument to createTaskElement
       createTaskElement(taskDataObj);
    }
-};
-
-var createTaskElement = function (taskDataObj) {
-   // Create list item
-   var listItemElement = document.createElement("li");
-   // Give it a class name
-   listItemElement.className = "task-item";
-
-   // Add task ID as a custom attribute
-   listItemElement.setAttribute("data-task-id", taskIdCounter);
-
-   // Create div item to hold task info and add to list item
-   var taskInfoElement = document.createElement("div");
-   // Give it a class name
-   taskInfoElement.className = "task-info";
-   // Add HTML content to div item
-   taskInfoElement.innerHTML =
-      "<h3 class='task-name'>" + taskDataObj.name + "</h3><span class='task-type'>" + taskDataObj.type + "</span>";
-   listItemElement.appendChild(taskInfoElement);
-
-   var taskActionsElement = createTaskActions(taskIdCounter);
-   listItemElement.appendChild(taskActionsElement);
-   // Add entire list item to list
-   tasksToDoElement.appendChild(listItemElement);
-
-   taskDataObj.id = taskIdCounter;
-
-   tasks.push(taskDataObj);
-
-   saveTasks();
-   // Increase task counter for next unique id
-   taskIdCounter++;
-};
-
-var saveTasks = function () {
-   localStorage.setItem("tasks", JSON.stringify(tasks));
-};
-
-var loadTasks = function () {
-   // Gets task items from localStorage.
-   tasks = localStorage.getItem("tasks");
-   console.log(tasks);
-
-   if (tasks === null) {
-      tasks = [];
-      return false;
-   }
-
-   tasks = JSON.parse(tasks);
-
-   console.log(tasks);
-   // Converts tasks from the string format back into an array of objects.
-
-   // Iterates through a tasks array and creates task elements on the page from it.
 };
 
 loadTasks();
